@@ -10,6 +10,7 @@ import colored
 
 targetIP = "0.0.0.0"
 targetPort = "0"
+isStop = False
 
 class PortScanner(QMainWindow):
     def __init__(self):
@@ -39,11 +40,6 @@ class PortScanner(QMainWindow):
         self.targetEdit.setMaxLength(31)
         self.targetEdit.setStyleSheet("background-color: white; color: red;")
         
-        targetIpButton = QPushButton("Submit")
-        targetIpButton.setFont(QFont("Arial", 15))
-        targetIpButton.setStyleSheet("background-color: #CC0000; color: #708090; border-radius: 10px; padding: 10px 20px;")
-        targetIpButton.clicked.connect(self.TargetIpChanged)
-        
         portLabel = QLabel("Select a target port:")
         portLabel.setFont(QFont("Arial", 15))
         portLabel.setStyleSheet("color: #FFFF33")
@@ -51,12 +47,7 @@ class PortScanner(QMainWindow):
         self.portEdit = QLineEdit()
         self.portEdit.setMaxLength(11)
         self.portEdit.setStyleSheet("background-color: white; color: red;")
-
-        targetPortButton = QPushButton("Submit")
-        targetPortButton.setFont(QFont("Arial", 15))
-        targetPortButton.setStyleSheet("background-color: #CC0000; color: #708090; border-radius: 10px; padding: 10px 20px;")
-        targetPortButton.clicked.connect(self.TargetPortChanged)
-
+        
         dataButton = QPushButton("Show target Ip and Port")
         dataButton.setFont(QFont("Arial", 15))
         dataButton.setStyleSheet("background-color: #CC0000; color: #708090; border-radius: 10px; padding: 10px 20px;")
@@ -125,7 +116,11 @@ class PortScanner(QMainWindow):
         msg_box.exec_()
     
     def save_to_file(self):
-        pass
+        filename, _ = QFileDialog.getSaveFileName(None, "Save file", '.', "Text files (*.txt);;All files(*.*)")
+        
+        if filename:
+            with open(filename, "w") as file:
+                file.write(self.textEdit.toPlainText())
         
     def startScanning(self):
         self.textEdit.clear()
@@ -135,35 +130,45 @@ class PortScanner(QMainWindow):
         self.PortScanner()
     
     def stopScanning(self):
-        pass
+        global isStop
+        isStop = True
         
     def ScanPort(self, target:str, ports:str):
         self.textEdit.append('<p style="font-size:18px; color: green;">Port    Result</p>')
         if "-" in ports:
             ports = ports.split("-")
             for port in range(int(ports[0]), int(ports[1])+1):
+                if isStop == False:
+                    try:
+                        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                        sock.connect((target, port))
+                        self.textEdit.append(f"<p style='font-size:18px; color: green;'>{port}\t\topen</p>")
+                        sock.close()
+                    except:
+                        pass
+            else:
                 try:
                     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    sock.connect((target, port))
-                    self.textEdit.append(f"<p style='font-size:18px; color: green;'>{port}\t\topen</p>")
+                    sock.connect((target, ports))
+                    self.textEdit.append(f"<p style='font-size:18px; color: green;>{port}open</p>")
                     sock.close()
                 except:
                     pass
-        else:
-            try:
-                sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                sock.connect((target, ports))
-                self.textEdit.append(f"<p style='font-size:18px; color: green;>{port}open</p>")
-                sock.close()
-            except:
-                pass
         
     def PortScanner(self):
         target_ips = self.TargetIpChanged()
         target_ports = self.TargetPortChanged()
-        for target in target_ips.split(","):
-            try:
-                self.textEdit.append(f"<h3>Scanning: {target}</h3>")
-                self.ScanPort(target, target_ports)
-            except:
-                pass
+        if "," in target_ips:
+            for target in target_ips.split(","):
+                try:
+                    self.textEdit.append(f"<h3>Scanning: {target}</h3>")
+                    self.ScanPort(target, target_ports)
+                except:
+                    pass
+        elif "-" in target_ips:
+            for target in target_ips.split('-'):
+                try:
+                    self.textEdit.append(f"<h3>Scanning: {target}</h3>")
+                    self.ScanPort(target, target_ports)
+                except:
+                    pass
