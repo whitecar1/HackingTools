@@ -149,7 +149,7 @@ class PortScanner(QMainWindow):
                     sock.close()
                 except:
                     pass
-        elif ports == "-":
+        elif ports == "*":
             for port in range(1, 65536):
                 try:
                     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -170,7 +170,7 @@ class PortScanner(QMainWindow):
         else:
             try:
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                sock.connect((target, port))
+                sock.connect((target, ports))
                 self.textEdit.append(f"<p style='font-size:18px; color: green;>{port}open</p>")
                 sock.close()
             except:
