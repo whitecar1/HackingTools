@@ -10,7 +10,6 @@ import colored
 
 targetIP = "0.0.0.0"
 targetPort = "0"
-isStop = False
 
 class PortScanner(QMainWindow):
     def __init__(self):
@@ -94,7 +93,7 @@ class PortScanner(QMainWindow):
     def TargetIpChanged(self):       
         targetIP = self.targetEdit.text()
         if targetIP == "":
-            return "0.0.0.0"
+            return "127.0.0.1"
         return targetIP
         
     def TargetPortChanged(self):
@@ -116,11 +115,7 @@ class PortScanner(QMainWindow):
         msg_box.exec_()
     
     def save_to_file(self):
-        filename, _ = QFileDialog.getSaveFileName(None, "Save file", '.', "Text files (*.txt);;All files(*.*)")
-        
-        if filename:
-            with open(filename, "w") as file:
-                file.write(self.textEdit.toPlainText())
+        pass
         
     def startScanning(self):
         self.textEdit.clear()
@@ -130,9 +125,7 @@ class PortScanner(QMainWindow):
         self.PortScanner()
     
     def stopScanning(self):
-        global isStop
-        isStop = True
-        print(isStop)
+        pass
         
     def ScanPort(self, target:str, ports:str):
         self.textEdit.append('<p style="font-size:18px; color: green;">Port    Result</p>')
