@@ -138,28 +138,10 @@ class PortScanner(QMainWindow):
         pass
         
     def ScanPort(self, target:str, ports:str):
-        self.textEdit.append('<p style="font-size:18px; color: green;">Port\t\t\tResult</p>')
+        self.textEdit.append('<p style="font-size:18px; color: green;">Port    Result</p>')
         if "-" in ports:
             ports = ports.split("-")
             for port in range(int(ports[0]), int(ports[1])+1):
-                try:
-                    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    sock.connect((target, port))
-                    self.textEdit.append(f"<p style='font-size:18px; color: green;'>{port}\t\topen</p>")
-                    sock.close()
-                except:
-                    pass
-        elif ports == "*":
-            for port in range(1, 65536):
-                try:
-                    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    sock.connect((target, port))
-                    self.textEdit.append(f"<p style='font-size:18px; color: green;'>{port}\t\topen</p>")
-                    sock.close()
-                except:
-                    pass
-        elif ports == "":
-            for port in range(1, 1025):
                 try:
                     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                     sock.connect((target, port))
