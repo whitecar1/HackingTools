@@ -132,28 +132,28 @@ class PortScanner(QMainWindow):
     def stopScanning(self):
         global isStop
         isStop = True
+        print(isStop)
         
     def ScanPort(self, target:str, ports:str):
         self.textEdit.append('<p style="font-size:18px; color: green;">Port    Result</p>')
         if "-" in ports:
             ports = ports.split("-")
             for port in range(int(ports[0]), int(ports[1])+1):
-                if isStop == False:
-                    try:
-                        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                        sock.connect((target, port))
-                        self.textEdit.append(f"<p style='font-size:18px; color: green;'>{port}\t\topen</p>")
-                        sock.close()
-                    except:
-                        pass
-            else:
                 try:
                     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    sock.connect((target, ports))
-                    self.textEdit.append(f"<p style='font-size:18px; color: green;>{port}open</p>")
+                    sock.connect((target, port))
+                    self.textEdit.append(f"<p style='font-size:18px; color: green;'>{port}\t\topen</p>")
                     sock.close()
                 except:
                     pass
+        else:
+            try:
+                sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                sock.connect((target, ports))
+                self.textEdit.append(f"<p style='font-size:18px; color: green;>{port}open</p>")
+                sock.close()
+            except:
+                pass
         
     def PortScanner(self):
         target_ips = self.TargetIpChanged()
