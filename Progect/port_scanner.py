@@ -10,6 +10,7 @@ import colored
 
 targetIP = "0.0.0.0"
 targetPort = "0"
+isStop = False
 
 class PortScanner(QMainWindow):
     def __init__(self):
@@ -46,12 +47,7 @@ class PortScanner(QMainWindow):
         self.portEdit = QLineEdit()
         self.portEdit.setMaxLength(11)
         self.portEdit.setStyleSheet("background-color: white; color: red;")
-
-        targetPortButton = QPushButton("Submit")
-        targetPortButton.setFont(QFont("Arial", 15))
-        targetPortButton.setStyleSheet("background-color: #CC0000; color: #708090; border-radius: 10px; padding: 10px 20px;")
-        targetPortButton.clicked.connect(self.TargetPortChanged)
-
+        
         dataButton = QPushButton("Show target Ip and Port")
         dataButton.setFont(QFont("Arial", 15))
         dataButton.setStyleSheet("background-color: #CC0000; color: #708090; border-radius: 10px; padding: 10px 20px;")
@@ -120,7 +116,11 @@ class PortScanner(QMainWindow):
         msg_box.exec_()
     
     def save_to_file(self):
-        pass
+        filename, _ = QFileDialog.getSaveFileName(None, "Save file", '.', "Text files (*.txt);;All files(*.*)")
+        
+        if filename:
+            with open(filename, "w") as file:
+                file.write(self.textEdit.toPlainText())
         
     def startScanning(self):
         self.textEdit.clear()
@@ -130,7 +130,9 @@ class PortScanner(QMainWindow):
         self.PortScanner()
     
     def stopScanning(self):
-        pass
+        global isStop
+        isStop = True
+        print(isStop)
         
     def ScanPort(self, target:str, ports:str):
         self.textEdit.append('<p style="font-size:18px; color: green;">Port    Result</p>')
