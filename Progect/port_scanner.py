@@ -39,11 +39,6 @@ class PortScanner(QMainWindow):
         self.targetEdit.setMaxLength(31)
         self.targetEdit.setStyleSheet("background-color: white; color: red;")
         
-        targetIpButton = QPushButton("Submit")
-        targetIpButton.setFont(QFont("Arial", 15))
-        targetIpButton.setStyleSheet("background-color: #CC0000; color: #708090; border-radius: 10px; padding: 10px 20px;")
-        targetIpButton.clicked.connect(self.TargetIpChanged)
-        
         portLabel = QLabel("Select a target port:")
         portLabel.setFont(QFont("Arial", 15))
         portLabel.setStyleSheet("color: #FFFF33")
@@ -161,9 +156,17 @@ class PortScanner(QMainWindow):
     def PortScanner(self):
         target_ips = self.TargetIpChanged()
         target_ports = self.TargetPortChanged()
-        for target in target_ips.split(","):
-            try:
-                self.textEdit.append(f"<h3>Scanning: {target}</h3>")
-                self.ScanPort(target, target_ports)
-            except:
-                pass
+        if "," in target_ips:
+            for target in target_ips.split(","):
+                try:
+                    self.textEdit.append(f"<h3>Scanning: {target}</h3>")
+                    self.ScanPort(target, target_ports)
+                except:
+                    pass
+        elif "-" in target_ips:
+            for target in target_ips.split('-'):
+                try:
+                    self.textEdit.append(f"<h3>Scanning: {target}</h3>")
+                    self.ScanPort(target, target_ports)
+                except:
+                    pass
