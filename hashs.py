@@ -1,0 +1,34 @@
+from PyQt5 import QtWidgets, QtGui, QtCore
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
+
+import settingsmanager
+import sys
+
+class HashsTools(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.initUI()
+        
+        self.setWindowTitle("HashTools")
+        self.setGeometry(360, 170, 1200, 800)
+        self.setStyleSheet("background-color: #000066")
+        
+        self.menu = settingsmanager.MenuBar()
+        self.setMenuBar(self.menu)
+        
+    def initUI(self):
+        statusLabel = QLabel("This page is currently not being developed!!!Follow updates!!!\t\nAvailable pages:\n\t1.Scanning.")
+        statusLabel.setFont(QFont("Arial", 20))
+        statusLabel.setStyleSheet("color: #CCAAAA;")
+        
+        self.main_buttons = settingsmanager.MainButtons()
+        
+        mainLayout = QGridLayout()
+        mainLayout.setSpacing(20)
+        mainLayout.addWidget(statusLabel, 0, 1, 1, 2)
+        mainLayout.addLayout(self.main_buttons.makeButtons(), 1, 0, 1, 3)
+        
+        centralWidget = QtWidgets.QWidget()
+        centralWidget.setLayout(mainLayout)
+        self.setCentralWidget(centralWidget)
