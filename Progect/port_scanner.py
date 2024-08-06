@@ -39,11 +39,6 @@ class PortScanner(QMainWindow):
         self.targetEdit.setMaxLength(31)
         self.targetEdit.setStyleSheet("background-color: white; color: red;")
         
-        targetIpButton = QPushButton("Submit")
-        targetIpButton.setFont(QFont("Arial", 15))
-        targetIpButton.setStyleSheet("background-color: #CC0000; color: #708090; border-radius: 10px; padding: 10px 20px;")
-        targetIpButton.clicked.connect(self.TargetIpChanged)
-        
         portLabel = QLabel("Select a target port:")
         portLabel.setFont(QFont("Arial", 15))
         portLabel.setStyleSheet("color: #FFFF33")
@@ -51,11 +46,6 @@ class PortScanner(QMainWindow):
         self.portEdit = QLineEdit()
         self.portEdit.setMaxLength(11)
         self.portEdit.setStyleSheet("background-color: white; color: red;")
-
-        targetPortButton = QPushButton("Submit")
-        targetPortButton.setFont(QFont("Arial", 15))
-        targetPortButton.setStyleSheet("background-color: #CC0000; color: #708090; border-radius: 10px; padding: 10px 20px;")
-        targetPortButton.clicked.connect(self.TargetPortChanged)
 
         dataButton = QPushButton("Show target Ip and Port")
         dataButton.setFont(QFont("Arial", 15))
@@ -125,7 +115,11 @@ class PortScanner(QMainWindow):
         msg_box.exec_()
     
     def save_to_file(self):
-        pass
+        filename, _ =QFileDialog.getSaveFileName(self, "Save file", "./", "Text file(*.txt);;All files(*.*)")
+        
+        if filename:
+            with open(filename, "w") as file:
+                file.write(self.textEdit.toPlainText())
         
     def startScanning(self):
         self.textEdit.clear()
@@ -138,32 +132,14 @@ class PortScanner(QMainWindow):
         pass
         
     def ScanPort(self, target:str, ports:str):
-        self.textEdit.append('<p style="font-size:18px; color: green;">Port\t\t\tResult</p>')
+        self.textEdit.append('<p style="font-size:18px; color: green;">Port     Result</p>')
         if "-" in ports:
             ports = ports.split("-")
             for port in range(int(ports[0]), int(ports[1])+1):
                 try:
                     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                     sock.connect((target, port))
-                    self.textEdit.append(f"<p style='font-size:18px; color: green;'>{port}\t\topen</p>")
-                    sock.close()
-                except:
-                    pass
-        elif ports == "-":
-            for port in range(1, 65536):
-                try:
-                    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    sock.connect((target, port))
-                    self.textEdit.append(f"<p style='font-size:18px; color: green;'>{port}\t\topen</p>")
-                    sock.close()
-                except:
-                    pass
-        elif ports == "":
-            for port in range(1, 1025):
-                try:
-                    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    sock.connect((target, port))
-                    self.textEdit.append(f"<p style='font-size:18px; color: green;'>{port}\t\topen</p>")
+                    self.textEdit.append(f"<p style='font-size:18px; color: green;'>{port}      open</p>")
                     sock.close()
                 except:
                     pass
@@ -171,7 +147,7 @@ class PortScanner(QMainWindow):
             try:
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 sock.connect((target, port))
-                self.textEdit.append(f"<p style='font-size:18px; color: green;>{port}open</p>")
+                self.textEdit.append(f"<p style='font-size:18px; color: green;>{port}       open</p>")
                 sock.close()
             except:
                 pass
