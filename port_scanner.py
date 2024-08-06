@@ -161,3 +161,5 @@ class PortScanner(QMainWindow):
                 self.ScanPort(target, target_ports)
             except:
                 pass
+
+print("test")
